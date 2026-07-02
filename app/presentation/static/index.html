@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Sales Intelligence</title>
+    <!-- Modern Premium Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h2>FinTech Intelligence</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="nav-dashboard">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="#" class="nav-item" id="nav-reports">
+                    <span class="icon">📑</span> Reports
+                </a>
+                <a href="#" class="nav-item" id="nav-settings">
+                    <span class="icon">⚙️</span> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="page-title">Sales Intelligence Dashboard</h1>
+                <div class="user-profile">
+                    <div class="avatar"></div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Input Section -->
+                <section class="glass-panel input-section">
+                    <h3>New Analysis</h3>
+                    <p class="subtitle">Enter a stock exchange to discover sales opportunities.</p>
+                    
+                    <form id="analysis-form" class="analysis-form">
+                        <div class="input-group">
+                            <label for="exchange-name">Exchange Name</label>
+                            <input type="text" id="exchange-name" placeholder="e.g. Dhaka Stock Exchange" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="country">Country (Optional)</label>
+                            <input type="text" id="country" placeholder="e.g. Bangladesh">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="start-btn">Start Analysis</button>
+                    </form>
+                </section>
+
+                <!-- Progress Section (Hidden initially) -->
+                <section class="glass-panel progress-section" id="progress-container" style="display: none;">
+                    <div class="progress-header">
+                        <h3>Analysis Progress: <span id="current-exchange-name"></span></h3>
+                        <span class="status-badge" id="job-status">Running</span>
+                    </div>
+                    
+                    <div class="pipeline-tracker">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progress-fill"></div>
+                        </div>
+                        
+                        <div class="steps-grid" id="steps-container">
+                            <!-- Steps generated via JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="error-box" id="error-box" style="display: none;">
+                        <h4>Error</h4>
+                        <p id="error-message"></p>
+                    </div>
+                </section>
+
+                <!-- Results Section (Hidden initially) -->
+                <section class="results-section" id="results-container" style="display: none;">
+                    <div class="stats-grid">
+                        <div class="glass-panel stat-card">
+                            <div class="stat-icon hot">🔥</div>
+                            <div class="stat-info">
+                                <h4>Hot Leads</h4>
+                                <span class="stat-value" id="stat-hot">0</span>
+                            </div>
+                        </div>
+                        <div class="glass-panel stat-card">
+                            <div class="stat-icon warm">☀️</div>
+                            <div class="stat-info">
+                                <h4>Warm Leads</h4>
+                                <span class="stat-value" id="stat-warm">0</span>
+                            </div>
+                        </div>
+                        <div class="glass-panel stat-card">
+                            <div class="stat-icon opps">💡</div>
+                            <div class="stat-info">
+                                <h4>Total Opportunities</h4>
+                                <span class="stat-value" id="stat-opps">0</span>
+                            </div>
+                        </div>
+                        <div class="glass-panel stat-card">
+                            <div class="stat-icon execs">👔</div>
+                            <div class="stat-info">
+                                <h4>Executives Found</h4>
+                                <span class="stat-value" id="stat-execs">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel results-table-container">
+                        <div class="table-header">
+                            <h3>Discovered Institutions</h3>
+                            <button class="btn btn-secondary" id="export-btn">Export CSV</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Institution</th>
+                                    <th>Type</th>
+                                    <th>Tech Score</th>
+                                    <th>Opportunities</th>
+                                    <th>Lead Tier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-table-body">
+                                <!-- Results populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

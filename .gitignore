@@ -1,0 +1,79 @@
+# ============================================================
+# FinTech Sales Intelligence — .gitignore
+# ============================================================
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+*.whl
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# ---- Virtual Environments ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Environment Variables ----
+.env
+.env.local
+.env.production
+.env.staging
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ---- Docker ----
+docker/volumes/
+postgres_data/
+redis_data/
+
+# ---- Testing ----
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ---- MyPy ----
+.mypy_cache/
+.dmypy.json
+
+# ---- Ruff ----
+.ruff_cache/
+
+# ---- Logs ----
+logs/
+*.log
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Playwright ----
+playwright-report/
+test-results/
+
+# ---- Misc ----
+*.bak
+*.tmp
+*.temp
+scratch/
