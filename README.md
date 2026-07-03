@@ -70,11 +70,13 @@ graph TB
    cp .env.example .env
    ```
 
-2. Configure your API keys in `.env`:
-   - Set `LLM_PROVIDER` (default is `openai`)
-   - Add the corresponding API key (e.g., `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`)
-   - Set `SEARCH_PROVIDER` (default is `serpapi`)
-   - Add the search API key (e.g., `SERPAPI_KEY`)
+2. Fill in your own local values in `.env`.
+   - Replace placeholders such as `<db_user>`, `<db_password>`, and `your-openai-api-key-here`
+   - Avoid committing `.env` to source control; it is already ignored by `.gitignore`
+
+3. In production (Render, Docker, cloud), set secrets using environment variables or service secrets instead of a committed `.env` file.
+   - Do not store real credentials or API keys in the repository
+   - Use `DATABASE_URL`, `OPENAI_API_KEY`, `MYSQL_PASSWORD`, etc. as secret env vars
 
 ### Running with Docker
 
