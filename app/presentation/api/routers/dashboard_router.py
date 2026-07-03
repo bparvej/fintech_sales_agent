@@ -32,7 +32,7 @@ async def serve_dashboard() -> Any:
     return HTMLResponse("<h1>FinTech Sales Intelligence</h1><p>Dashboard UI not built yet.</p>")
 
 
-@router.websocket("/ws/progress/{job_id}")
+@router.websocket("/api/v1/dashboard/ws/progress/{job_id}")
 async def progress_websocket(websocket: WebSocket, job_id: str) -> None:
     """WebSocket endpoint for real-time analysis progress updates."""
     await websocket.accept()
