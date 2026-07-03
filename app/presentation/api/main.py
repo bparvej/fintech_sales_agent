@@ -20,7 +20,8 @@ from app.shared.config.settings import get_settings
 from app.shared.logging.logger import get_logger, setup_logging
 from app.infrastructure.database.connection import db_manager
 from app.infrastructure.cache.redis_client import cache
-from app.presentation.api.routers import analysis_router, dashboard_router
+from app.infrastructure.database.seeders import seed_stock_exchanges
+from app.presentation.api.routers import analysis_router, dashboard_router, config_router, exchanges_router
 from app.domain.exceptions.domain_exceptions import DomainException
 
 logger = get_logger(__name__)
@@ -67,6 +68,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Create tables when in debug mode or explicitly enabled via DB_INIT
     if get_settings().app_debug or get_settings().db_init:
         await db_manager.create_tables()
+        # Seed initial data
+        async with db_manager.get_session() as session:
+            await seed_stock_exchanges(session)
         
     await cache.initialize()
     
@@ -105,6 +109,7 @@ def create_app() -> FastAPI:
     # Exception Handlers
     @app.exception_handler(DomainException)
     async def domain_exception_handler(request: Request, exc: DomainException) -> JSONResponse:
+        logger.warning(f"Domain exception: {exc.message}", details=exc.details)
         return JSONResponse(
             status_code=400,
             content={
@@ -112,15 +117,40 @@ def create_app() -> FastAPI:
                 "details": exc.details
             }
         )
+    
+    @app.exception_handler(ValueError)
+    async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
+        """Handle ValueError from LLM clients (e.g., missing API keys)."""
+        error_msg = str(exc)
+        logger.warning(f"Validation error: {error_msg}")
+        
+        # Check if it's an API key or auth error
+        if any(keyword in error_msg.lower() for keyword in ["api key", "unauthorized", "401", "auth"]):
+            return JSONResponse(
+                status_code=401,
+                content={
+                    "error": "LLM Configuration Error",
+                    "message": error_msg,
+                    "details": "Please configure the required API key in .env and restart the application."
+                }
+            )
+        
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Validation Error", "message": error_msg}
+        )
         
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+        logger.error(f"Unhandled exception: {type(exc).__name__}: {str(exc)}", exc_info=True)
         return JSONResponse(
             status_code=500,
             content={"error": "An internal server error occurred"}
         )
     
     # Routers
+    app.include_router(config_router.router, prefix="/api/v1/config", tags=["Configuration"])
+    app.include_router(exchanges_router.router, prefix="/api/v1", tags=["Exchanges"])
     app.include_router(analysis_router.router, prefix="/api/v1/analysis", tags=["Analysis"])
     app.include_router(dashboard_router.router, tags=["Dashboard"])
     
@@ -135,6 +165,6 @@ def create_app() -> FastAPI:
         
     @app.get("/api/v1/health", tags=["System"])
     async def health_check() -> dict[str, str]:
-        return {"status": "ok"}
+        return {"status": "ok", "version": "1.0.0"}
         
     return app

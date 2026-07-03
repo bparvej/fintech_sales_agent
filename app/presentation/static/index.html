@@ -48,14 +48,44 @@
                     <p class="subtitle">Enter a stock exchange to discover sales opportunities.</p>
                     
                     <form id="analysis-form" class="analysis-form">
-                        <div class="input-group">
-                            <label for="exchange-name">Exchange Name</label>
-                            <input type="text" id="exchange-name" placeholder="e.g. Dhaka Stock Exchange" required>
+                        <!-- LLM & Model Selection -->
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="llm-provider">LLM Provider</label>
+                                <select id="llm-provider" class="form-select">
+                                    <option value="">Loading providers...</option>
+                                </select>
+                                <small id="llm-warning" class="warning-text" style="display: none;"></small>
+                            </div>
+                            <div class="input-group">
+                                <label for="llm-model">Model</label>
+                                <select id="llm-model" class="form-select">
+                                    <option value="">Select model</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="country">Country (Optional)</label>
-                            <input type="text" id="country" placeholder="e.g. Bangladesh">
+                        
+                        <!-- Exchange & Country Selection -->
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="country">Country</label>
+                                <select id="country" class="form-select">
+                                    <option value="">Loading countries...</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="exchange-list">Stock Exchange</label>
+                                <select id="exchange-list" class="form-select">
+                                    <option value="">Select exchange</option>
+                                </select>
+                            </div>
                         </div>
+                        
+                        <div class="input-group full-width">
+                            <label for="exchange-name">Or Enter Custom Exchange</label>
+                            <input type="text" id="exchange-name" placeholder="e.g. Dhaka Stock Exchange (optional)">
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary" id="start-btn">Start Analysis</button>
                     </form>
                 </section>

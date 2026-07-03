@@ -15,7 +15,6 @@ from app.application.dto.analysis_dtos import (
     AnalysisResultResponse,
 )
 from app.application.services.analysis_service import AnalysisService
-from app.infrastructure.llm.llm_factory import LLMFactory
 
 router = APIRouter()
 analysis_service = AnalysisService()
@@ -43,9 +42,3 @@ async def get_analysis_results(job_id: uuid.UUID) -> AnalysisResultResponse:
         return await analysis_service.get_results(job_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-        
-        
-@router.get("/llm-providers", response_model=list[dict[str, str]])
-async def get_llm_providers() -> list[dict[str, str]]:
-    """Get available LLM providers for the UI."""
-    return LLMFactory.available_providers()

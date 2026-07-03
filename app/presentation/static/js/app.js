@@ -1,13 +1,19 @@
 /**
  * FinTech Sales Intelligence Dashboard Logic
+ * With LLM provider and exchange selection support
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // --- Elements ---
     const form = document.getElementById('analysis-form');
     const startBtn = document.getElementById('start-btn');
     const exchangeInput = document.getElementById('exchange-name');
-    const countryInput = document.getElementById('country');
+    
+    const llmProviderSelect = document.getElementById('llm-provider');
+    const llmModelSelect = document.getElementById('llm-model');
+    const llmWarning = document.getElementById('llm-warning');
+    const countrySelect = document.getElementById('country');
+    const exchangeListSelect = document.getElementById('exchange-list');
     
     const progressContainer = document.getElementById('progress-container');
     const currentExchangeName = document.getElementById('current-exchange-name');
@@ -21,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsContainer = document.getElementById('results-container');
     
     let currentWs = null;
+    let selectedProvider = null;
 
     // --- Pipeline Steps Definition ---
     const PIPELINE_STEPS = [
@@ -37,6 +44,146 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 11, key: 'generating_insights', label: 'Generating Insights' },
         { id: 12, key: 'generating_emails', label: 'Generating Emails' },
     ];
+
+    // --- Initialize Dropdowns on Page Load ---
+    async function initializeDropdowns() {
+        try {
+            // Load LLM Providers
+            await loadLLMProviders();
+            
+            // Load Countries
+            await loadCountries();
+        } catch (err) {
+            console.error('Failed to initialize dropdowns:', err);
+        }
+    }
+
+    // --- Load LLM Providers ---
+    async function loadLLMProviders() {
+        try {
+            const response = await fetch('/api/v1/config/llm-providers');
+            if (!response.ok) throw new Error('Failed to load LLM providers');
+            
+            const providers = await response.json();
+            
+            llmProviderSelect.innerHTML = '';
+            providers.forEach(provider => {
+                const option = document.createElement('option');
+                option.value = provider.value;
+                option.textContent = provider.label + (provider.configured ? ' ✓' : ' (not configured)');
+                option.dataset.configured = provider.configured;
+                option.dataset.warning = provider.warning || '';
+                llmProviderSelect.appendChild(option);
+            });
+            
+            // Set first configured provider as default
+            const configuredProvider = providers.find(p => p.configured);
+            if (configuredProvider) {
+                llmProviderSelect.value = configuredProvider.value;
+                selectedProvider = configuredProvider.value;
+                await loadModelsForProvider(configuredProvider.value);
+            }
+        } catch (err) {
+            console.error('Error loading LLM providers:', err);
+            llmProviderSelect.innerHTML = '<option value="">Error loading providers</option>';
+        }
+    }
+
+    // --- Load Models for Provider ---
+    async function loadModelsForProvider(provider) {
+        try {
+            const response = await fetch(`/api/v1/config/llm-models/${provider}`);
+            if (!response.ok) throw new Error('Failed to load models');
+            
+            const data = await response.json();
+            const models = data.models || [];
+            
+            llmModelSelect.innerHTML = '';
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                llmModelSelect.appendChild(option);
+            });
+            
+            // Check if provider is configured
+            const selectedOption = llmProviderSelect.options[llmProviderSelect.selectedIndex];
+            const isConfigured = selectedOption.dataset.configured === 'true';
+            
+            if (!isConfigured) {
+                llmWarning.textContent = selectedOption.dataset.warning;
+                llmWarning.style.display = 'block';
+            } else {
+                llmWarning.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Error loading models:', err);
+            llmModelSelect.innerHTML = '<option value="">Error loading models</option>';
+        }
+    }
+
+    // --- Load Countries ---
+    async function loadCountries() {
+        try {
+            const response = await fetch('/api/v1/config/countries');
+            if (!response.ok) throw new Error('Failed to load countries');
+            
+            const data = await response.json();
+            const countries = data.countries || [];
+            
+            countrySelect.innerHTML = '<option value="">All Countries</option>';
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+        } catch (err) {
+            console.error('Error loading countries:', err);
+            countrySelect.innerHTML = '<option value="">Error loading countries</option>';
+        }
+    }
+
+    // --- Load Exchanges for Country ---
+    async function loadExchangesForCountry(country) {
+        try {
+            let url = '/api/v1/exchanges';
+            if (country) {
+                url += `?country=${encodeURIComponent(country)}`;
+            }
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to load exchanges');
+            
+            const data = await response.json();
+            const exchanges = data.exchanges || [];
+            
+            exchangeListSelect.innerHTML = '<option value="">Select an exchange</option>';
+            exchanges.forEach(exchange => {
+                const option = document.createElement('option');
+                option.value = exchange.name;
+                option.textContent = exchange.name + (exchange.total_members ? ` (${exchange.total_members} members)` : '');
+                exchangeListSelect.appendChild(option);
+            });
+        } catch (err) {
+            console.error('Error loading exchanges:', err);
+            exchangeListSelect.innerHTML = '<option value="">Error loading exchanges</option>';
+        }
+    }
+
+    // --- Event Listeners ---
+    llmProviderSelect.addEventListener('change', (e) => {
+        selectedProvider = e.target.value;
+        loadModelsForProvider(e.target.value);
+    });
+
+    countrySelect.addEventListener('change', (e) => {
+        loadExchangesForCountry(e.target.value);
+    });
+
+    exchangeListSelect.addEventListener('change', (e) => {
+        exchangeInput.value = e.target.value;
+    });
 
     // --- Initialize UI ---
     function initStepsUI() {
@@ -58,9 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const exchangeName = exchangeInput.value.trim();
-        const country = countryInput.value.trim();
+        const country = countrySelect.value.trim();
+        const provider = llmProviderSelect.value;
+        const model = llmModelSelect.value;
         
-        if (!exchangeName) return;
+        if (!exchangeName) {
+            showError('Please select or enter an exchange name');
+            return;
+        }
+        
+        if (!provider) {
+            showError('Please select an LLM provider');
+            return;
+        }
 
         // Reset UI
         errorBox.style.display = 'none';
@@ -80,14 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     exchange_name: exchangeName,
-                    country: country || null
+                    country: country || null,
+                    llm_provider: provider,
+                    llm_model: model || undefined
                 })
             });
 
             const data = await response.json();
             
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to start analysis');
+                throw new Error(data.detail || data.error || 'Failed to start analysis');
             }
 
             // 2. Connect WebSocket for live progress
@@ -107,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/progress/${jobId}`;
+        const wsUrl = `${protocol}//${window.location.host}/api/v1/dashboard/ws/progress/${jobId}`;
         
         currentWs = new WebSocket(wsUrl);
 
@@ -234,4 +393,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initial Setup
     initStepsUI();
+    initializeDropdowns();
 });
