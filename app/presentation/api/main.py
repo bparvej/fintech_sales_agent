@@ -64,7 +64,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Application starting up")
     
     await db_manager.initialize()
-    if get_settings().app_debug:
+    # Create tables when in debug mode or explicitly enabled via DB_INIT
+    if get_settings().app_debug or get_settings().db_init:
         await db_manager.create_tables()
         
     await cache.initialize()

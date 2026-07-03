@@ -6,7 +6,7 @@ services:
     region: oregon
     dockerfilePath: docker/Dockerfile
     buildCommand: ""
-    startCommand: "uvicorn app.presentation.api.main:create_app --factory --host 0.0.0.0 --port 8000"
+    startCommand: "uvicorn app.presentation.api.main:create_app --factory --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         scope: secret
@@ -24,5 +24,8 @@ services:
         scope: secret
       - key: SECRET_KEY
         scope: secret
+      - key: DB_INIT
+        value: "true"
+        scope: private
     autoDeploy: true
     branch: main

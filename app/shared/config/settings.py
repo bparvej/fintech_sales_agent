@@ -109,6 +109,8 @@ class Settings(BaseSettings):
     # ---- Logging ----
     log_level: str = "INFO"
     log_format: Literal["json", "console"] = "json"
+    # ---- Database init on startup (for quick deploys)
+    db_init: bool = False
 
     @property
     def is_production(self) -> bool:
