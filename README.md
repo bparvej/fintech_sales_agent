@@ -32,7 +32,7 @@ graph TB
     end
 
     subgraph Infrastructure["Infrastructure Layer"]
-        DB["PostgreSQL"]
+        DB["MySQL"]
         CACHE["Redis"]
         LLM["Multi-LLM (OpenAI/DeepSeek/Qwen)"]
         SEARCH["Search API (SerpAPI/Google)"]
@@ -86,7 +86,7 @@ docker-compose up -d
 
 This will start:
 - FastAPI Application (Port 8000)
-- PostgreSQL Database (Port 5432)
+- MySQL Database (Port 3306)
 - Redis Cache (Port 6379)
 
 ### Accessing the Platform
@@ -114,3 +114,16 @@ mypy app/
 # Run tests
 pytest tests/
 ```
+
+## Deploying to Render
+
+This repository includes a `render.yaml` to deploy the app as a Docker web service.
+
+Quick steps:
+
+1. Push this branch to your Git remote.
+2. In Render, create a new service and connect your repo (or import using `render.yaml`).
+3. Set required environment variables/secrets in the Render dashboard: `DATABASE_URL`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`, `MYSQL_HOST`, `MYSQL_PORT`, `REDIS_URL`, `SECRET_KEY`.
+4. If you need a managed MySQL instance, provision an external MySQL provider (e.g., PlanetScale, Amazon RDS) and point `DATABASE_URL` to it.
+
+Render does not currently offer a managed MySQL database; for production use please provision an external MySQL instance and configure the `DATABASE_URL` secret accordingly.

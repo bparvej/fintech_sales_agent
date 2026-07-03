@@ -49,7 +49,7 @@ The system automatically:
 10. Analyze digital maturity.
 11. Identify software modernization opportunities.
 12. Generate personalized sales insights.
-13. Store all information in PostgreSQL.
+13. Store all information in MySQL.
 
 ---
 
@@ -125,7 +125,7 @@ Domain Layer
 
 Infrastructure Layer
 
-* PostgreSQL
+* MySQL
 * SQLAlchemy
 * Alembic
 * Playwright
@@ -238,7 +238,7 @@ SQLAlchemy 2
 
 Alembic
 
-PostgreSQL
+MySQL
 
 Redis
 

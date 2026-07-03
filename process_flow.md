@@ -28,7 +28,7 @@ sequenceDiagram
     participant Discovery as Agents 1-3
     participant Analysis as Agents 4-9
     participant Strategy as Agents 10-12
-    participant DB as PostgreSQL
+    participant DB as MySQL
     
     User->>Orchestrator: Start Analysis ("Dhaka Stock Exchange")
     activate Orchestrator
@@ -79,7 +79,7 @@ sequenceDiagram
 
 ## State Management and Fault Tolerance
 
-- **Database Persistence**: The orchestrator saves state to PostgreSQL after every step. If the pipeline crashes, data up to that point is preserved.
+-- **Database Persistence**: The orchestrator saves state to MySQL after every step. If the pipeline crashes, data up to that point is preserved.
 - **Audit Logging**: Every agent execution is logged in the `audit_logs` table, recording tokens used, duration, and success/failure.
 - **WebSocket Broadcasts**: The orchestrator broadcasts the `AnalysisStatus` via WebSocket, allowing the dashboard UI to show real-time progress bars for the 13 distinct pipeline stages.
 - **Retry Logic**: All external network calls (search, crawling, LLM) use exponential backoff via the `@async_retry` decorator to handle transient failures gracefully.

@@ -20,8 +20,8 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    JSON,
 )
-from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import relationship
 
 from app.domain.value_objects.institution_type import InstitutionType
@@ -32,7 +32,7 @@ from app.infrastructure.database.connection import Base
 class ExchangeModel(Base):
     __tablename__ = "exchanges"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(500), nullable=False, index=True)
     country = Column(String(200), nullable=True)
     website_url = Column(Text, nullable=True)
@@ -50,8 +50,8 @@ class ExchangeModel(Base):
 class InstitutionModel(Base):
     __tablename__ = "institutions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"), nullable=False, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    exchange_id = Column(String(36), ForeignKey("exchanges.id"), nullable=False, index=True)
     name = Column(String(500), nullable=False, index=True)
     institution_type = Column(
         Enum(InstitutionType, name="institution_type_enum"),
@@ -79,8 +79,8 @@ class InstitutionModel(Base):
 class ExecutiveModel(Base):
     __tablename__ = "executives"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    institution_id = Column(UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=False, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    institution_id = Column(String(36), ForeignKey("institutions.id"), nullable=False, index=True)
     name = Column(String(500), nullable=False)
     title = Column(String(300), nullable=True)
     email = Column(String(300), nullable=True)
@@ -100,8 +100,8 @@ class ExecutiveModel(Base):
 class TechnologyProfileModel(Base):
     __tablename__ = "technology_profiles"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    institution_id = Column(UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=False, unique=True, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    institution_id = Column(String(36), ForeignKey("institutions.id"), nullable=False, unique=True, index=True)
     detected_technologies = Column(JSON, default=list)
     frontend_technologies = Column(JSON, default=list)
     backend_technologies = Column(JSON, default=list)
@@ -125,8 +125,8 @@ class TechnologyProfileModel(Base):
 class SalesOpportunityModel(Base):
     __tablename__ = "sales_opportunities"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    institution_id = Column(UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=False, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    institution_id = Column(String(36), ForeignKey("institutions.id"), nullable=False, index=True)
     opportunity_type = Column(
         Enum(OpportunityType, name="opportunity_type_enum"),
         nullable=False,
@@ -147,8 +147,8 @@ class SalesOpportunityModel(Base):
 class LeadScoreModel(Base):
     __tablename__ = "lead_scores"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    institution_id = Column(UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=False, unique=True, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    institution_id = Column(String(36), ForeignKey("institutions.id"), nullable=False, unique=True, index=True)
     overall_score = Column(Float, default=0.0)
     technology_score = Column(Float, default=0.0)
     digital_presence_score = Column(Float, default=0.0)
@@ -167,8 +167,8 @@ class LeadScoreModel(Base):
 class SalesReportModel(Base):
     __tablename__ = "sales_reports"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    exchange_id = Column(UUID(as_uuid=True), ForeignKey("exchanges.id"), nullable=False, index=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    exchange_id = Column(String(36), ForeignKey("exchanges.id"), nullable=False, index=True)
     title = Column(String(500), nullable=False)
     summary = Column(Text, nullable=True)
     total_institutions = Column(Integer, default=0)
@@ -187,10 +187,10 @@ class SalesReportModel(Base):
 class AuditLogModel(Base):
     __tablename__ = "audit_logs"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     action = Column(String(200), nullable=False, index=True)
     entity_type = Column(String(100), nullable=False, index=True)
-    entity_id = Column(UUID(as_uuid=True), nullable=True)
+    entity_id = Column(String(36), nullable=True)
     agent_name = Column(String(200), nullable=True)
     details = Column(JSON, default=dict)
     duration_ms = Column(Integer, nullable=True)

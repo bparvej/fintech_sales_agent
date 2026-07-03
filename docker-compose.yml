@@ -13,12 +13,12 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-fintech}:${POSTGRES_PASSWORD:-fintech_secret}@postgres:5432/${POSTGRES_DB:-fintech_sales}
+      - DATABASE_URL=mysql+asyncmy://${MYSQL_USER:-fintech}:${MYSQL_PASSWORD:-fintech_secret}@mysql:3306/${MYSQL_DB:-fintech_sales}
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
-      - POSTGRES_HOST=postgres
+      - MYSQL_HOST=mysql
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -29,20 +29,21 @@ services:
     networks:
       - fintech-network
 
-  # ---- PostgreSQL ----
-  postgres:
-    image: postgres:16-alpine
-    container_name: fintech-postgres
+  # ---- MySQL ----
+  mysql:
+    image: mysql:8.0
+    container_name: fintech-mysql
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-fintech}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fintech_secret}
-      POSTGRES_DB: ${POSTGRES_DB:-fintech_sales}
+      MYSQL_USER: ${MYSQL_USER:-fintech}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-fintech_secret}
+      MYSQL_DATABASE: ${MYSQL_DB:-fintech_sales}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fintech} -d ${POSTGRES_DB:-fintech_sales}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u ${MYSQL_USER:-fintech} -p${MYSQL_PASSWORD:-fintech_secret}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -67,17 +68,14 @@ services:
     networks:
       - fintech-network
 
-  # ---- pgAdmin (Development Only) ----
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: fintech-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@fintech.local
-      PGADMIN_DEFAULT_PASSWORD: admin
+  # ---- Adminer (Development Only) ----
+  adminer:
+    image: adminer:latest
+    container_name: fintech-adminer
     ports:
-      - "5050:80"
+      - "8080:8080"
     depends_on:
-      - postgres
+      - mysql
     restart: unless-stopped
     networks:
       - fintech-network
@@ -85,7 +83,7 @@ services:
       - dev
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:
 
 networks:

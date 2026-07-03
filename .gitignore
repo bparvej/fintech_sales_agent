@@ -41,7 +41,7 @@ ENV/
 
 # ---- Docker ----
 docker/volumes/
-postgres_data/
+mysql_data/
 redis_data/
 
 # ---- Testing ----

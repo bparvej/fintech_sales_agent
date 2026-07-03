@@ -53,12 +53,12 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-to-a-random-secret-key"
 
     # ---- Database ----
-    database_url: str = "postgresql+asyncpg://fintech:fintech_secret@localhost:5432/fintech_sales"
-    postgres_user: str = "fintech"
-    postgres_password: str = "fintech_secret"
-    postgres_db: str = "fintech_sales"
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
+    database_url: str = "mysql+asyncmy://fintech:fintech_secret@localhost:3306/fintech_sales"
+    mysql_user: str = "fintech"
+    mysql_password: str = "fintech_secret"
+    mysql_db: str = "fintech_sales"
+    mysql_host: str = "localhost"
+    mysql_port: int = 3306
 
     # ---- Redis ----
     redis_url: str = "redis://localhost:6379/0"
