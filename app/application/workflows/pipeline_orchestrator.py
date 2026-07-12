@@ -54,10 +54,12 @@ logger = get_logger(__name__)
 class PipelineOrchestrator:
     """Master orchestrator for the FinTech Sales Intelligence pipeline."""
 
-    def __init__(self, job_id: uuid.UUID, exchange_name: str, country: str | None = None) -> None:
+    def __init__(self, job_id: uuid.UUID, exchange_name: str, country: str | None = None, llm_provider: str | None = None, search_provider: str | None = None) -> None:
         self.job_id = job_id
         self.exchange_name = exchange_name
         self.country = country
+        self.llm_provider = llm_provider
+        self.search_provider = search_provider
         
         # Agents
         self.agent_exchange = ExchangeDiscoveryAgent()

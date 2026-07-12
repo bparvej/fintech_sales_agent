@@ -50,11 +50,25 @@
                     <form id="analysis-form" class="analysis-form">
                         <div class="input-group">
                             <label for="exchange-name">Exchange Name</label>
-                            <input type="text" id="exchange-name" placeholder="e.g. Dhaka Stock Exchange" required>
+                            <select id="exchange-name" required>
+                                <option value="" disabled selected>Select an exchange...</option>
+                                <option value="Dhaka Stock Exchange">Dhaka Stock Exchange</option>
+                                <option value="New York Stock Exchange">New York Stock Exchange</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="London Stock Exchange">London Stock Exchange</option>
+                                <option value="Tokyo Stock Exchange">Tokyo Stock Exchange</option>
+                            </select>
                         </div>
                         <div class="input-group">
                             <label for="country">Country (Optional)</label>
-                            <input type="text" id="country" placeholder="e.g. Bangladesh">
+                            <select id="country">
+                                <option value="" selected>Select a country... (Optional)</option>
+                                <option value="Bangladesh">Bangladesh</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Japan">Japan</option>
+                                <option value="India">India</option>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary" id="start-btn">Start Analysis</button>
                     </form>
