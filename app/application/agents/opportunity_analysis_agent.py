@@ -43,10 +43,10 @@ class OpportunityAnalysisOutput(BaseModel):
 
 
 class OpportunityAnalysisAgent(BaseAgent[OpportunityAnalysisInput, OpportunityAnalysisOutput]):
-    def __init__(self) -> None:
+    def __init__(self, llm_provider: str | None = None) -> None:
         super().__init__("OpportunityAnalysisAgent")
         # We need the smart model for reasoning
-        self.llm = LLMFactory.create()
+        self.llm = LLMFactory.create_for_provider_name(llm_provider) if llm_provider else LLMFactory.create()
         
         # Valid types for prompt guidance
         valid_types = [t.value for t in OpportunityType]

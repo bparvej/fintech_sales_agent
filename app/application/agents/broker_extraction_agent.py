@@ -36,7 +36,7 @@ class BrokerExtractionOutput(BaseModel):
 
 
 class BrokerExtractionAgent(BaseAgent[BrokerExtractionInput, BrokerExtractionOutput]):
-    def __init__(self) -> None:
+    def __init__(self, llm_provider: str | None = None) -> None:
         super().__init__("BrokerExtractionAgent")
         self.crawler = WebCrawler()
         
@@ -44,7 +44,7 @@ class BrokerExtractionAgent(BaseAgent[BrokerExtractionInput, BrokerExtractionOut
         settings = __import__("app.shared.config.settings").shared.config.settings.get_settings()
         # In a real implementation, we'd use the configured 'mini' model, 
         # but for simplicity we'll just use the factory default.
-        self.llm = LLMFactory.create()
+        self.llm = LLMFactory.create_for_provider_name(llm_provider) if llm_provider else LLMFactory.create()
         
         self.system_prompt = """
         You are an expert at extracting structured data from HTML content.
@@ -85,6 +85,11 @@ class BrokerExtractionAgent(BaseAgent[BrokerExtractionInput, BrokerExtractionOut
         
         if not text:
             raise ValueError(f"No text extracted from member list page: {input_data.member_list_url}")
+        
+        # Truncate content to avoid API request size limits (e.g. Groq free tier)
+        max_chars = 8000
+        if len(text) > max_chars:
+            text = text[:max_chars] + "\n\n[... content truncated ...]"
             
         prompt = f"""
         Exchange: {input_data.exchange_name}
@@ -97,8 +102,7 @@ class BrokerExtractionAgent(BaseAgent[BrokerExtractionInput, BrokerExtractionOut
         llm_response = await self.llm.complete_json(
             prompt=prompt,
             system_prompt=self.system_prompt,
-            # Extraction tasks can be longer
-            max_tokens=8192
+            max_tokens=4096
         )
         
         try:

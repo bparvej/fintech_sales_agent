@@ -24,6 +24,7 @@ class LLMProvider(str, Enum):
     QWEN = "qwen"
     OLLAMA = "ollama"
     GEMINI = "gemini"
+    GROQ = "groq"
 
 
 class SearchProvider(str, Enum):
@@ -89,6 +90,11 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.5-flash"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
+    # ---- Groq (Free tier, OpenAI-compatible) ----
+    groq_api_key: str = ""
+    groq_model: str = "groq/compound-mini"
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+
     # ---- Ollama ----
     ollama_base_url: str = "http://localhost:11434/v1"
     ollama_model: str = "llama3"
@@ -122,6 +128,8 @@ class Settings(BaseSettings):
             LLMProvider.DEEPSEEK: self.deepseek_api_key,
             LLMProvider.QWEN: self.qwen_api_key,
             LLMProvider.OLLAMA: "",  # Ollama runs locally
+            LLMProvider.GEMINI: self.gemini_api_key,
+            LLMProvider.GROQ: self.groq_api_key,
         }
         return key_map[self.llm_provider]
 
@@ -133,6 +141,8 @@ class Settings(BaseSettings):
             LLMProvider.DEEPSEEK: self.deepseek_model,
             LLMProvider.QWEN: self.qwen_model,
             LLMProvider.OLLAMA: self.ollama_model,
+            LLMProvider.GEMINI: self.gemini_model,
+            LLMProvider.GROQ: self.groq_model,
         }
         return model_map[self.llm_provider]
 
@@ -144,6 +154,8 @@ class Settings(BaseSettings):
             LLMProvider.DEEPSEEK: self.deepseek_base_url,
             LLMProvider.QWEN: self.qwen_base_url,
             LLMProvider.OLLAMA: self.ollama_base_url,
+            LLMProvider.GEMINI: self.gemini_base_url,
+            LLMProvider.GROQ: self.groq_base_url,
         }
         return url_map[self.llm_provider]
 

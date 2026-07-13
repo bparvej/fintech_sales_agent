@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('start-btn');
     const exchangeInput = document.getElementById('exchange-name');
     const countryInput = document.getElementById('country');
+    const llmProviderInput = document.getElementById('llm-provider');
     
     const progressContainer = document.getElementById('progress-container');
     const currentExchangeName = document.getElementById('current-exchange-name');
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const exchangeName = exchangeInput.value.trim();
         const country = countryInput.value.trim();
+        const llmProvider = llmProviderInput.value;
         
         if (!exchangeName) return;
 
@@ -80,7 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     exchange_name: exchangeName,
-                    country: country || null
+                    country: country || null,
+                    llm_provider: llmProvider
                 })
             });
 

@@ -35,9 +35,9 @@ class TechnologyDetectionOutput(BaseModel):
 
 
 class TechnologyDetectionAgent(BaseAgent[TechnologyDetectionInput, TechnologyDetectionOutput]):
-    def __init__(self) -> None:
+    def __init__(self, llm_provider: str | None = None) -> None:
         super().__init__("TechnologyDetectionAgent")
-        self.llm = LLMFactory.create()
+        self.llm = LLMFactory.create_for_provider_name(llm_provider) if llm_provider else LLMFactory.create()
         
         self.system_prompt = """
         You are an expert technology analyst.

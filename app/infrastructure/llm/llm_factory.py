@@ -207,6 +207,12 @@ class LLMFactory:
             model=s.gemini_model,
             provider_name="Gemini",
         ),
+        LLMProvider.GROQ: lambda s: OpenAICompatibleClient(
+            api_key=s.groq_api_key,
+            base_url=s.groq_base_url,
+            model=s.groq_model,
+            provider_name="Groq",
+        ),
     }
 
     @classmethod
@@ -256,5 +262,8 @@ class LLMFactory:
             elif p == LLMProvider.GEMINI and settings.gemini_api_key:
                 info["configured"] = True
                 info["model"] = settings.gemini_model
+            elif p == LLMProvider.GROQ and settings.groq_api_key:
+                info["configured"] = True
+                info["model"] = settings.groq_model
             providers.append(info)
         return providers

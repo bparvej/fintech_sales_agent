@@ -33,9 +33,9 @@ class EmailGenerationOutput(BaseModel):
 
 
 class EmailGenerationAgent(BaseAgent[EmailGenerationInput, EmailGenerationOutput]):
-    def __init__(self) -> None:
+    def __init__(self, llm_provider: str | None = None) -> None:
         super().__init__("EmailGenerationAgent")
-        self.llm = LLMFactory.create()
+        self.llm = LLMFactory.create_for_provider_name(llm_provider) if llm_provider else LLMFactory.create()
         
         self.system_prompt = """
         You are an expert enterprise software sales executive.

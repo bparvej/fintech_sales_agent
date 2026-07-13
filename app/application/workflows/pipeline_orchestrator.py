@@ -63,17 +63,17 @@ class PipelineOrchestrator:
         
         # Agents
         self.agent_exchange = ExchangeDiscoveryAgent()
-        self.agent_members = MemberListDiscoveryAgent()
-        self.agent_brokers = BrokerExtractionAgent()
+        self.agent_members = MemberListDiscoveryAgent(llm_provider=llm_provider)
+        self.agent_brokers = BrokerExtractionAgent(llm_provider=llm_provider)
         self.agent_web_discover = WebsiteDiscoveryAgent()
         self.agent_crawler = WebsiteCrawlerAgent()
-        self.agent_tech = TechnologyDetectionAgent()
-        self.agent_execs = ExecutiveDiscoveryAgent()
+        self.agent_tech = TechnologyDetectionAgent(llm_provider=llm_provider)
+        self.agent_execs = ExecutiveDiscoveryAgent(llm_provider=llm_provider)
         self.agent_profiles = ProfileResolverAgent()
-        self.agent_opportunities = OpportunityAnalysisAgent()
+        self.agent_opportunities = OpportunityAnalysisAgent(llm_provider=llm_provider)
         self.agent_scoring = LeadScoringAgent()
-        self.agent_insights = SalesInsightAgent()
-        self.agent_email = EmailGenerationAgent()
+        self.agent_insights = SalesInsightAgent(llm_provider=llm_provider)
+        self.agent_email = EmailGenerationAgent(llm_provider=llm_provider)
         
         # State
         self.status = AnalysisStatus.PENDING

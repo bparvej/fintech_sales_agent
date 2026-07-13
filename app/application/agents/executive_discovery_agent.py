@@ -33,9 +33,9 @@ class ExecutiveDiscoveryOutput(BaseModel):
 
 
 class ExecutiveDiscoveryAgent(BaseAgent[ExecutiveDiscoveryInput, ExecutiveDiscoveryOutput]):
-    def __init__(self) -> None:
+    def __init__(self, llm_provider: str | None = None) -> None:
         super().__init__("ExecutiveDiscoveryAgent")
-        self.llm = LLMFactory.create()
+        self.llm = LLMFactory.create_for_provider_name(llm_provider) if llm_provider else LLMFactory.create()
         self.search_provider = SearchProviderFactory.create()
         
         self.system_prompt = """
